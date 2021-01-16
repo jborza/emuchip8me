@@ -19,6 +19,7 @@ public class Chip8Canvas extends Canvas implements CommandListener {
     static final int CMD_RESET = 2;
     static final int CMD_ZLAST = 3; // must be ze last, of course
     Command cmd[];
+    private String rom;
 
     public Chip8Canvas(MIDlet midlet){
         this.midlet = midlet;
@@ -34,7 +35,7 @@ public class Chip8Canvas extends Canvas implements CommandListener {
         cmd[CMD_RESET] = new MyCommand("Reset", Command.SCREEN, 1, CMD_RESET);
 
         setCommandListener(this);
-        //TODO we can also modify commands at runtime
+        //TODO we could also modify commands at runtime
         addCommand(cmd[CMD_ABOUT]);
         addCommand(cmd[CMD_EXIT]);
         addCommand(cmd[CMD_RESET]);
@@ -76,6 +77,9 @@ public class Chip8Canvas extends Canvas implements CommandListener {
         }
     }
 
+    public void setRom(String rom) {
+        this.rom = rom;
+    }
 
 
     class MyCommand extends Command{
