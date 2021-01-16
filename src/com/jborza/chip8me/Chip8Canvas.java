@@ -11,6 +11,8 @@ public class Chip8Canvas extends Canvas implements CommandListener {
     Font font;
     Random random;
 
+    RomStorage romStorage;
+
     //commands
     static final int CMD_ABOUT = 0;
     static final int CMD_EXIT = 1;
@@ -23,6 +25,8 @@ public class Chip8Canvas extends Canvas implements CommandListener {
         display = Display.getDisplay(midlet);
         font = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
         random = new Random();
+
+        romStorage = new RomStorage();
 
         cmd= new Command[CMD_ZLAST];
         cmd[CMD_ABOUT] = new MyCommand("About", Command.HELP, 9, CMD_ABOUT);
