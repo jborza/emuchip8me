@@ -13,6 +13,10 @@ public class Chip8Canvas extends Canvas implements CommandListener {
 
     RomStorage romStorage;
 
+    //CHIP-8 specifics
+    CPU cpu;
+
+
     //commands
     static final int CMD_ABOUT = 0;
     static final int CMD_EXIT = 1;
@@ -31,7 +35,7 @@ public class Chip8Canvas extends Canvas implements CommandListener {
 
         cmd= new Command[CMD_ZLAST];
         cmd[CMD_ABOUT] = new MyCommand("About", Command.HELP, 9, CMD_ABOUT);
-        cmd[CMD_EXIT] = new MyCommand("Exit", Command.EXIT, 8, CMD_EXIT);
+        cmd[CMD_EXIT] = new MyCommand("Step", Command.EXIT, 8, CMD_EXIT);
         cmd[CMD_RESET] = new MyCommand("Reset", Command.SCREEN, 1, CMD_RESET);
 
         setCommandListener(this);
@@ -39,6 +43,13 @@ public class Chip8Canvas extends Canvas implements CommandListener {
         addCommand(cmd[CMD_ABOUT]);
         addCommand(cmd[CMD_EXIT]);
         addCommand(cmd[CMD_RESET]);
+    }
+
+    private void reset(){
+        cpu = new CPU();
+        cpu.loadRom(romStorage.getRom(rom));
+        cpu.loadFont();
+        cpu.reset();
     }
 
     int lastKeyCode = -1;
@@ -55,11 +66,20 @@ public class Chip8Canvas extends Canvas implements CommandListener {
         g.fillRect(0,0, getWidth(), getHeight());
         g.setColor(0);
         g.setFont(font);
-        g.drawString("w:"+getWidth()+ " h:"+getHeight(), 0,10, Graphics.BOTTOM| Graphics.LEFT);
-        g.drawString("keycode:"+lastKeyCode, 0,30, Graphics.BOTTOM| Graphics.LEFT);
 
-        g.drawString("HELLO J2ME IN 2021", getWidth()/2,50, Graphics.BOTTOM| Graphics.HCENTER);
+        //draw the graphics rom?
+//        g.drawLine(0,0,64,32);
+//        g.drawLine(64,0,64,32);
+        for(int y = 0; y < 32; y++){
+            for(int x = 0; x < 64; x++){
+                if(cpu.state.display[y*64+x] != 0)
+                    g.drawLine(x,y,x+1,y+1);
+            }
+        }
 
+
+        g.drawString("PC:"+cpu.state.PC+ " I:"+cpu.state.I, 0,32, Graphics.TOP| Graphics.LEFT);
+        g.drawString("v0:"+cpu.state.V[0]+" v1:"+cpu.state.V[1], 0,42, Graphics.TOP| Graphics.LEFT);
     }
 
     public void commandAction(Command command, Displayable displayable) {
@@ -68,10 +88,13 @@ public class Chip8Canvas extends Canvas implements CommandListener {
                 About.showAbout(display);
                 break;
             case CMD_EXIT:
-                midlet.notifyDestroyed();
+                //midlet.notifyDestroyed();
+                cpu.emulate_op();
+                repaint();
                 break;
             case CMD_RESET:
                 //TODO restart CHIP-8
+                reset();
                 repaint();
                 break;
         }
@@ -79,8 +102,8 @@ public class Chip8Canvas extends Canvas implements CommandListener {
 
     public void setRom(String rom) {
         this.rom = rom;
+        reset();
     }
-
 
     class MyCommand extends Command{
         int tag;

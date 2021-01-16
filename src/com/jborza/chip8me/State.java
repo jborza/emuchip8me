@@ -9,7 +9,7 @@ public class State {
     public static final int CHIP8_DISPLAY_SIZE = DISPLAY_WIDTH * DISPLAY_HEIGHT;
     public static final int CHIP8_MEMORY_SIZE = 4096;
     public static final int CHIP8_KEY_COUNT = 16;
-    public static final int FONT_OFFSET = 0x10;
+    public static final int FONT_OFFSET = 0x0;
     public static final int PROGRAM_OFFSET = 0x200;
 
     public byte[] memory;
