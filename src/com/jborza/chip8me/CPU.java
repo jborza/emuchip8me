@@ -233,7 +233,6 @@ public class CPU {
                             if (state.keys[i]) {
                                 state.V[vx] = i;
                                 keypress = true;
-                                System.out.println("got keypress:" + i);
                                 break;
                             }
                         }

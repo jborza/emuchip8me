@@ -62,24 +62,17 @@ public class Chip8Canvas extends Canvas implements CommandListener {
     }
 
     public void keyPressed(int code) {
-        //paint the code later
         lastKeyCode = code;
         //decode keys into CHIP-8 keys
-        //123C
-        //456D
-        //789E
-        //A0BF
         int chip8KeyCode = Keymap.getChip8Key(code);
         if(chip8KeyCode != Keymap.KEY_INVALID)
             cpu.state.keys[chip8KeyCode] = true;
-        repaint();
     }
 
     public void keyReleased(int code){
         int chip8KeyCode = Keymap.getChip8Key(code);
-//        if(chip8KeyCode != Keymap.KEY_INVALID)
-//            cpu.state.keys[chip8KeyCode] = false;
-//        repaint();
+        if(chip8KeyCode != Keymap.KEY_INVALID)
+            cpu.state.keys[chip8KeyCode] = false;
     }
 
     private void configureScale() {
@@ -129,8 +122,11 @@ public class Chip8Canvas extends Canvas implements CommandListener {
         g.setFont(font);
 
         g.setColor(0xFFFFFF);
-        g.fillRect(0, 0, getWidth(), getHeight());
-//        g.fillRect(offsetX, offsetY, Chip8HW.DISPLAY_WIDTH * scale, Chip8HW.DISPLAY_HEIGHT * scale);
+//        g.fillRect(0, 0, getWidth(), getHeight());
+        if(scale15x)
+            g.fillRect(0,0, 96, 48);
+        else
+            g.fillRect(offsetX, offsetY, Chip8HW.DISPLAY_WIDTH * scale, Chip8HW.DISPLAY_HEIGHT * scale);
 
         g.setColor(0x0);
         //draw the graphics rom
@@ -138,7 +134,7 @@ public class Chip8Canvas extends Canvas implements CommandListener {
 
         //3410: 96x55
         g.setColor(0x0);
-        g.drawString("k:" + lastKeyCode + " scale:" + scale + " PC:" + CPU.charToHex(cpu.state.PC), 0, getHeight(), Graphics.BOTTOM | Graphics.LEFT);
+//        g.drawString("k:" + lastKeyCode + " scale:" + scale + " PC:" + CPU.charToHex(cpu.state.PC), 0, getHeight(), Graphics.BOTTOM | Graphics.LEFT);
     }
 
     int scale15Lookup[];
