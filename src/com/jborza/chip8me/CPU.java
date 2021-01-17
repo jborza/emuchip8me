@@ -253,7 +253,6 @@ public class CPU {
                         break;
                     case 0x001E:
                         // add vx to I
-                        System.out.println("visiting FX1E");
                         state.I += state.V[vx];
                         break;
                     case 0x0029:
