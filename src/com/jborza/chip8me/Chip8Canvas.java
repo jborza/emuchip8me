@@ -18,14 +18,16 @@ public class Chip8Canvas extends Canvas implements CommandListener {
 
 
     //commands
-    static final int CMD_ABOUT = 0;
-    static final int CMD_EXIT = 1;
-    static final int CMD_RESET = 2;
-    static final int CMD_ZLAST = 3; // must be ze last, of course
-    Command cmd[];
+    private final static Command CMD_EXIT = new Command("Exit", Command.EXIT, 1);
+    private final static Command CMD_ABOUT = new Command("About", Command.HELP, 9);
+    private final static Command CMD_STEP = new Command("Step", Command.OK, 0);
+    private final static Command CMD_STEP100 = new Command("Step x100", Command.OK, 2);
+    private final static Command CMD_STEP1000 = new Command("Step x1000", Command.OK, 3);
+    private final static Command CMD_RESET = new Command("Reset", Command.SCREEN, 9);
+
     private String rom;
 
-    public Chip8Canvas(MIDlet midlet){
+    public Chip8Canvas(MIDlet midlet) {
         this.midlet = midlet;
         display = Display.getDisplay(midlet);
         font = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_PLAIN, Font.SIZE_SMALL);
@@ -33,19 +35,15 @@ public class Chip8Canvas extends Canvas implements CommandListener {
 
         romStorage = new RomStorage();
 
-        cmd= new Command[CMD_ZLAST];
-        cmd[CMD_ABOUT] = new MyCommand("About", Command.HELP, 9, CMD_ABOUT);
-        cmd[CMD_EXIT] = new MyCommand("Step", Command.EXIT, 8, CMD_EXIT);
-        cmd[CMD_RESET] = new MyCommand("Reset", Command.SCREEN, 1, CMD_RESET);
-
         setCommandListener(this);
         //TODO we could also modify commands at runtime
-        addCommand(cmd[CMD_ABOUT]);
-        addCommand(cmd[CMD_EXIT]);
-        addCommand(cmd[CMD_RESET]);
+        addCommand(CMD_RESET);
+        addCommand(CMD_STEP);
+        addCommand(CMD_STEP100);
+        addCommand(CMD_STEP1000);
     }
 
-    private void reset(){
+    private void reset() {
         cpu = new CPU();
         cpu.loadRom(romStorage.getRom(rom));
         cpu.loadFont();
@@ -54,63 +52,57 @@ public class Chip8Canvas extends Canvas implements CommandListener {
 
     int lastKeyCode = -1;
 
-    public void keyPressed(int code){
+    public void keyPressed(int code) {
         //paint the code later
         lastKeyCode = code;
         repaint();
     }
 
-    public void paint(Graphics g){
+    public void paint(Graphics g) {
         //draw diagnostic info
         g.setColor(0xFFFFFF);
-        g.fillRect(0,0, getWidth(), getHeight());
+        g.fillRect(0, 0, getWidth(), getHeight());
         g.setColor(0);
         g.setFont(font);
 
-        //draw the graphics rom?
-//        g.drawLine(0,0,64,32);
-//        g.drawLine(64,0,64,32);
-        for(int y = 0; y < 32; y++){
-            for(int x = 0; x < 64; x++){
-                if(cpu.state.display[y*64+x] != 0)
-                    g.drawLine(x,y,x+1,y+1);
+        //draw the graphics rom
+        for (int y = 0; y < Chip8HW.DISPLAY_HEIGHT; y++) {
+            for (int x = 0; x < Chip8HW.DISPLAY_WIDTH; x++) {
+                if (cpu.state.display[y * Chip8HW.DISPLAY_WIDTH + x] != 0)
+//                    g.drawRect(x,y,1,1);
+                    g.drawLine(x, y, x, y);
             }
         }
 
 
-        g.drawString("PC:"+cpu.state.PC+ " I:"+cpu.state.I, 0,32, Graphics.TOP| Graphics.LEFT);
-        g.drawString("v0:"+cpu.state.V[0]+" v1:"+cpu.state.V[1], 0,42, Graphics.TOP| Graphics.LEFT);
+        g.drawString("PC:" + cpu.state.PC + " I:" + cpu.state.I, 0, 32, Graphics.TOP | Graphics.LEFT);
+        g.drawString("v0:" + cpu.state.V[0] + " v1:" + cpu.state.V[1], 0, 42, Graphics.TOP | Graphics.LEFT);
     }
 
     public void commandAction(Command command, Displayable displayable) {
-        switch(((MyCommand)command).tag){
-            case CMD_ABOUT:
-                About.showAbout(display);
-                break;
-            case CMD_EXIT:
-                //midlet.notifyDestroyed();
+        if (command == CMD_STEP) {
+            cpu.emulate_op();
+            repaint();
+        } else if (command == CMD_STEP100) {
+            for (int i = 0; i < 100; i++)
                 cpu.emulate_op();
-                repaint();
-                break;
-            case CMD_RESET:
-                //TODO restart CHIP-8
-                reset();
-                repaint();
-                break;
+            repaint();
+        } else if (command == CMD_STEP1000) {
+            for (int i = 0; i < 1000; i++)
+                cpu.emulate_op();
+            repaint();
+        } else if (command == CMD_EXIT) {
+            midlet.notifyDestroyed();
+        } else if (command == CMD_ABOUT) {
+            About.showAbout(display);
+        } else if (command == CMD_RESET) {
+            reset();
+            repaint();
         }
     }
 
     public void setRom(String rom) {
         this.rom = rom;
         reset();
-    }
-
-    class MyCommand extends Command{
-        int tag;
-
-        MyCommand(String label, int type, int pri, int tag){
-            super(label,type,pri);
-            this.tag = tag;
-        }
     }
 }
