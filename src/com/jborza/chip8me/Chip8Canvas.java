@@ -22,7 +22,7 @@ public class Chip8Canvas extends Canvas implements CommandListener {
     //commands
     private final static Command CMD_EXIT = new Command("Exit", Command.EXIT, 1);
     private final static Command CMD_ABOUT = new Command("About", Command.HELP, 9);
-    private final static Command CMD_STEP = new Command("Step", Command.OK, 0);
+    private final static Command CMD_STEP = new Command("Step", Command.BACK, 0);
     private final static Command CMD_STEP100 = new Command("Step x100", Command.OK, 2);
     private final static Command CMD_STEP1000 = new Command("Step x1000", Command.OK, 3);
     private final static Command CMD_RESET = new Command("Reset", Command.SCREEN, 9);
@@ -93,16 +93,16 @@ public class Chip8Canvas extends Canvas implements CommandListener {
             for (int y = 0; y < Chip8HW.DISPLAY_HEIGHT; y++) {
                 for (int x = 0; x < Chip8HW.DISPLAY_WIDTH; x++) {
                     if (cpu.state.display[y * Chip8HW.DISPLAY_WIDTH + x] != 0)
-                        g.drawRect(x*scale + offsetX,y*scale + offsetY,1,1);
+                        g.fillRect(x*scale + offsetX,y*scale + offsetY,scale,scale);
 //                        g.drawLine(x, y, x, y);
                 }
             }
         }
 
         //3410: 96x55
+        g.setColor(0xFFFFFF);
         System.out.println("canvas: "+getWidth()+"x"+getHeight());
-        g.drawString("k:" + lastKeyCode, 0, getHeight(), Graphics.BOTTOM | Graphics.LEFT);
-        g.drawString("v0:" + cpu.state.V[0] + " v1:" + cpu.state.V[1], 0, 42, Graphics.TOP | Graphics.LEFT);
+        g.drawString("k:" + lastKeyCode+" scale:"+scale +" w:"+getWidth()+" h:"+getHeight(), 0, getHeight(), Graphics.BOTTOM | Graphics.LEFT);
     }
 
     public void commandAction(Command command, Displayable displayable) {
