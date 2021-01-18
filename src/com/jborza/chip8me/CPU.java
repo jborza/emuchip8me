@@ -46,15 +46,17 @@ public class CPU {
         state.V[0xF] = 0;
 
         for (int y = 0; y < sprite_height; y++) {
-            sprite_row = state.memory[state.I + y];
+            sprite_row = state.memory[(char) (state.I + y)];
             for (int x = 0; x < 8; x++) {
                 //get the x-th pixel from the sprite row
                 if ((sprite_row & (0x80 >> x)) != 0) {
                     int display_pixel_address = ((ry + y) * Chip8HW.DISPLAY_WIDTH + rx + x) % (Chip8HW.CHIP8_DISPLAY_SIZE);
+
                     if (state.display[display_pixel_address] == 1) {
                         state.V[0xF] = 1;
                     }
                     state.display[display_pixel_address] ^= 1;
+
                 }
             }
         }
@@ -70,6 +72,7 @@ public class CPU {
         byte vx, vy;
         vx = (byte) ((opcode & 0x0F00) >> 8);
         vy = (byte) ((opcode & 0x00F0) >> 4);
+
         switch (opcode & 0xF000) {
             case 0x0000:
                 switch ((char) (opcode & 0x00FF)) {
@@ -260,9 +263,10 @@ public class CPU {
                         break;
                     case 0x0033:
                         //take the decimal representation of VX, place the hundreds digit in memory at location in I, the tens digit at location I+1, and the ones digit at location I+2.
-                        state.memory[state.I] = (byte) (state.V[vx] / 100);
-                        state.memory[state.I + 1] = (byte) ((state.V[vx] / 10) % 10);
-                        state.memory[state.I + 2] = (byte) ((state.V[vx] % 100) % 10);
+                        int unsignedValue = (char)state.V[vx] & 0xFF;
+                        state.memory[state.I] = (byte) (unsignedValue / 100);
+                        state.memory[state.I + 1] = (byte) ((unsignedValue / 10) % 10);
+                        state.memory[state.I + 2] = (byte) ((unsignedValue % 100) % 10);
                         break;
                     case 0x0055:
                         //fill memory at I to I+x (inclusive!) with values of v0 to vx
@@ -292,9 +296,9 @@ public class CPU {
             update_timers();
         state.total_cycles++;
 
-        if(debug) {
+        if (debug) {
             StringBuffer sb = new StringBuffer();
-            sb.append("PC:");
+            sb.append("After PC:");
             appendHex(sb, state.PC);
             sb.append(" OP:");
             appendHex(sb, opcode);
@@ -302,6 +306,12 @@ public class CPU {
             appendHex(sb, state.I);
             sb.append(" DT:");
             appendByte(sb, state.delay_timer);
+            sb.append(" V0:");
+            appendByte(sb, state.V[0]);
+            sb.append(" V1:");
+            appendByte(sb, state.V[1]);
+            sb.append(" V2:");
+            appendByte(sb, state.V[2]);
             System.out.println(sb.toString());
         }
     }
@@ -309,6 +319,12 @@ public class CPU {
     static String charToHex(char ch) {
         StringBuffer sb = new StringBuffer();
         appendHex(sb, ch);
+        return sb.toString();
+    }
+
+    static String byteToHex(byte b) {
+        StringBuffer sb = new StringBuffer();
+        appendByte(sb, b);
         return sb.toString();
     }
 
