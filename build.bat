@@ -14,8 +14,8 @@ set JAVA_FILES=
 set JAVA_FILES=%JAVA_FILES% src\com\jborza\chip8me\*.java
 
 rem set path to JDK here
-set JAVAC=c:\tools\j2sdk1.4.2_19\bin\javac
-set JAR=c:\tools\j2sdk1.4.2_19\bin\jar
+set JAVAC=c:\j2sdk1.4.2_19\bin\javac
+set JAR=c:\j2sdk1.4.2_19\bin\jar
 
 
 echo *** Creating directories ***

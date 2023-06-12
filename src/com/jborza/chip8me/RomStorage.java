@@ -24,20 +24,17 @@ public class RomStorage {
 
     public String[] getRoms(){
         String[] roms = {
-                "logo.ch8",
-                "demo-poo.ch8",
                 "brix.ch8",
-                "test_opcode.ch8",
-                "sierpinski.ch8",
+                "chip8.ch8",
+                "demo-poo.ch8",
+                "keyboard.ch8",
+                "logo.ch8",
                 "lunar.ch8",
                 "particle.ch8",
                 "random-flip.ch8",
-                "scrolling-dot.ch8",
-                "mondrian.ch8",
-                "astrododge.ch8",
-                "chip8.ch8",
-                "keypad-test.ch8",
-                "15-puzzle.ch8"
+                "sierpinski.ch8",
+                "test-opcode.ch8",
+                "worm.ch8"
         };
         return roms;
     }
